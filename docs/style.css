@@ -1,0 +1,17 @@
+table { border-collapse: collapse; }
+td, th { padding: 0.3em; border: 1px solid; }
+
+table .ChargeBy { font-size: smaller; }
+.ChargeBy td { padding: 0.2em; border: none; }
+
+.Requirements td { padding: 0.2em; border: none; }
+.Requirements .total { font-weight: bold; border-top: 1px solid; }
+
+table .StatBonuses { font-size: smaller; }
+.StatBonuses td { padding: 0.2em; border: none; }
+
+.anchor { display:block; position:relative; top:-2em; }
+.anchor:target + .Name { outline:#808080 1px dotted; font-size: larger; }
+
+.Name { font-weight: bold; }
+.Subtitle { font-style: italic; }
