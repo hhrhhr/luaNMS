@@ -31,14 +31,14 @@ html:write([[
 <body>
 ]])
 
-html:write("<ul>")
+html:write("<ul>\n")
 
 for i = 1, #langcode do
     local l = langcode[i]
-    html:write("<li><a href='index_" .. i .. ".html'>" .. l .. "</a></li>")
+    html:write("<li><a href='index_" .. i .. ".html'>" .. l .. "</a></li>\n")
 end
 
-html:write("</ul>")
+html:write("</ul>\n")
 
 html:write("</body>\n")
 html:close()

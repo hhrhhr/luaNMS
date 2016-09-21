@@ -519,7 +519,7 @@ print("OK")
 local loc_names = {
     lang["SUBSTANCE"][L],
     lang["PRODUCT"][L],
-    lang["TRA_TECHNOLOGY"][L]
+    lang["TECH"][L]
 }
 
 io.write("write index_" .. L .. ".html... ")
