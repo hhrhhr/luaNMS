@@ -22,6 +22,8 @@ langcode = {
 --]]
 
 local exml_dir = assert(arg[1], "\n\n[ERROR] no input dir with NMS_LOC1.exml\n\n")
+local out_dir = arg[2] or "."
+
 xml = require("LuaXML")
 
 local x = xml.load(exml_dir .. "/NMS_LOC1.exml")
@@ -48,7 +50,7 @@ for i = 1, #x1 do
     end
 end
 
-local w = assert(io.open("_lang.lua", "w+"))
+local w = assert(io.open(out_dir .. "/_lang.lua", "w+"))
 w:write("lang = {\n")
 for k, v in pairs(lang) do
     w:write("[\"" .. k .. "\"] = {\n")

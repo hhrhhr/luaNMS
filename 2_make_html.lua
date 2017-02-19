@@ -20,7 +20,9 @@ langcode = {
 }
 
 local exml_dir = assert(arg[1], "\n\n[ERROR] no input dir with NMS_REALITY_*.exml\n\n")
-local L = tonumber(arg[2]) or -1 -- manual lang code
+local out_dir = arg[2] or "."
+local L = tonumber(arg[3]) or -1 -- manual lang code
+
 
 xml = require("LuaXml")
 
@@ -33,9 +35,7 @@ local x1
 
 local function get_icon_name(path)
     local s = string.match(path, "^.+/(.+)$")
-    s = string.sub(s, 1, -5)
-    s = "img/" .. s .. ".png"
-    return s
+    return string.sub(s, 1, -5)
 end
 
 --[[ substance ]]--------------------------------------------------------------
@@ -251,7 +251,7 @@ for i = 1, #icon do
 end
 icon = nil
 
-local w = assert(io.open("icons_list.txt", "w+"))
+local w = assert(io.open(out_dir .. "/_icons_list.txt", "w+"))
 for i = 1, #t do
     w:write(t[i])
     w:write("\n")
@@ -268,7 +268,7 @@ local function td(body, bg)
         bc = string.format(" bgcolor='#%02x%02x%02x'", bg[1], bg[2], bg[3])
 --        bc = string.format(" bgcolor='rgb(%d,%d,%d)'", bg[1], bg[2], bg[3])
     end
-    return "<td" .. bc .. ">" .. body .. "</td>"
+    return "<td" .. bc .. ">" .. body .. "</td>\n"
 end
 
 local function anchor(id)
@@ -280,7 +280,11 @@ local function div(class, body)
 end
 
 local function img(src)
-    return "<img src='" .. src .. "' />"
+    return "<img src='" .. src .. "' />\n"
+end
+
+local function css_sprite(src)
+    return "<i class='" .. src .. "'>&nbsp;</i>"
 end
 
 local function find_by_id(tname, id)
@@ -301,7 +305,7 @@ local function find_by_id(tname, id)
     return nil
 end
 
-dofile("_lang.lua")
+dofile(out_dir .. "/_lang.lua")
 
 --------------------------------------------------------------------------------
 
@@ -310,7 +314,7 @@ local function html_output(L)
 --[[ substance_#.html]]-----------------------------------------------------------
     
     io.write("write substance_" .. L .. ".html... ")
-    local html = assert(io.open("substance_" .. L .. ".html", "w+"))
+    local html = assert(io.open(out_dir .. "/substance_" .. L .. ".html", "w+"))
     
     html:write([[
 <html>
@@ -324,14 +328,16 @@ local function html_output(L)
     for i = 1, #substance do
     --    print(substance[i].Id)
         local s = substance[i]
-        html:write("<tr>")
+        html:write("<tr>\n")
     
-        html:write(td(img(s.Icon), s.Colour))
+        --html:write(td(img(s.Icon), s.Colour))           -- icon
+        html:write(td(css_sprite(s.Icon), s.Colour))    -- sprite
+
         html:write("<td>")
         html:write(anchor(s.Id))
         html:write(div("Name", lang[s.NameLower][L]))
         html:write(div("Subtitle", lang[s.Subtitle][L]))
-        html:write("</td>")
+        html:write("</td>\n")
         html:write(td(lang[s.Symbol][L]))
         html:write(td(s.BaseValue .. "U"))
         html:write(td(lang[s.Description][L]))
@@ -349,7 +355,7 @@ local function html_output(L)
 --[[ product_#.html]]-------------------------------------------------------------
     
     io.write("write product_" .. L .. ".html... ")
-    html = assert(io.open("product_" .. L .. ".html", "w+"))
+    html = assert(io.open(out_dir .. "/product_" .. L .. ".html", "w+"))
     
     html:write([[
 <html>
@@ -365,7 +371,9 @@ local function html_output(L)
         local p = product[i]
         html:write("<tr>")
     
-        html:write(td(img(p.Icon), p.Colour))
+        --html:write(td(img(p.Icon), p.Colour))           -- icon
+        html:write(td(css_sprite(p.Icon), p.Colour))    -- sprite
+
         html:write("<td>")
         html:write(anchor(p.Id))
         html:write(div("Name", lang[p.NameLower] and lang[p.NameLower][L] or p.NameLower))
@@ -408,7 +416,7 @@ local function html_output(L)
 --[[ technology_#.html]]----------------------------------------------------------
     
     io.write("write technology_" .. L .. ".html... ")
-    html = assert(io.open("technology_" .. L .. ".html", "w+"))
+    html = assert(io.open(out_dir .. "/technology_" .. L .. ".html", "w+"))
     
     html:write([[
 <html>
@@ -424,11 +432,41 @@ local function html_output(L)
         local t = technology[i]
         html:write("<tr>")
     
-        html:write(td(img(t.Icon), t.Colour))
+        --html:write(td(img(t.Icon), t.Colour))           -- icon
+        html:write(td(css_sprite(t.Icon), t.Colour))    -- sprite
+
         html:write("<td>")
         html:write(anchor(t.Id))
         html:write(div("Name", lang[t.NameLower][L]))
         html:write(div("Subtitle", lang[t.Subtitle][L]))
+
+        if #t.ChargeBy > 0 then
+            html:write("<hr>")
+            html:write("<table class='ChargeBy' cols='2'>")
+            html:write("<caption>" .. lang["CHARGE"][L] .. "</caption>")
+            for j = 1, #t.ChargeBy do
+                html:write("<tr>")
+                local id = t.ChargeBy[j]
+    
+                local tid = find_by_id("Substance", id)
+                local name
+                if tid then
+                    name = lang[tid.NameLower][L]
+                    name = "<a href='substance_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
+                else
+                    tid = find_by_id("Product", id)
+                    name = lang[tid.NameLower][L]
+                    name = "<a href='product_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
+                end
+                html:write("<td>" .. name .. "</td>")
+    
+                local charge = string.format("%.1f", t.ChargeAmount / tid.ChargeValue)
+                html:write("<td>" .. charge .. "</td>")
+                html:write("</tr>")
+            end
+            html:write("</table>")
+        end
+
         html:write("</td>")
         html:write(td(t.Value .. "U"))
     
@@ -454,7 +492,7 @@ local function html_output(L)
         end
     
         html:write("</td><td>")
-    
+--[[    
         if #t.ChargeBy > 0 then
             html:write("<table class='ChargeBy'>")
             for j = 1, #t.ChargeBy do
@@ -481,7 +519,7 @@ local function html_output(L)
         end
     
         html:write("</td><td>")
-    
+--]]    
         if #t.StatBonuses > 0 then
             html:write("<table class='StatBonuses'>")
             for j = 1, #t.StatBonuses do
@@ -517,7 +555,7 @@ local function html_output(L)
     }
     
     io.write("write index_" .. L .. ".html... ")
-    html = assert(io.open("index_" .. L .. ".html", "w+"))
+    html = assert(io.open(out_dir .. "/index_" .. L .. ".html", "w+"))
     
     html:write([[
 <html>
@@ -528,9 +566,9 @@ local function html_output(L)
 <ul>
 ]])
     
-    html:write("<li><a href='substance_" .. L .. ".html'>" .. loc_names[1] .. "</a></li>")
-    html:write("<li><a href='product_" .. L .. ".html'>" .. loc_names[2] .. "</a></li>")
-    html:write("<li><a href='technology_" .. L .. ".html'>" .. loc_names[3] .. "</a></li>")
+    html:write("<li><a href='substance_" .. L .. ".html'>" .. loc_names[1] .. "</a></li>\n")
+    html:write("<li><a href='product_" .. L .. ".html'>" .. loc_names[2] .. "</a></li>\n")
+    html:write("<li><a href='technology_" .. L .. ".html'>" .. loc_names[3] .. "</a></li>\n")
     html:write("</ul>\n")
     html:write("</body>\n")
 
@@ -545,7 +583,7 @@ end
 
 local function index_output()
     io.write("write index.html... ")
-    html = assert(io.open("index.html", "w+"))
+    html = assert(io.open(out_dir .. "/index.html", "w+"))
     
     html:write([[
 <html>
@@ -579,3 +617,28 @@ else
     end
     index_output()
 end
+
+
+--[[ style.css ]]---------------------------------------------------------------
+
+io.write("write style.css... ")
+local css = assert(io.open(out_dir .. "/style.css", "w+"))
+css:write([[
+table { border-collapse: collapse; }
+td, th { padding: 0.3em; border: 1px solid; }
+table .ChargeBy { font-size: smaller; }
+.ChargeBy caption { text-align: right; }
+.ChargeBy td { padding: 0 0.1em; border: none; }
+.Requirements td { padding: 0.2em; border: none; }
+.Requirements .total { font-weight: bold; border-top: 1px solid; }
+table .StatBonuses { font-size: smaller; }
+.StatBonuses td { padding: 0.2em; border: none; }
+.anchor { display:block; position:relative; top:-2em; }
+.anchor:target + .Name { outline:#808080 1px dotted; font-size: larger; }
+.Name { font-weight: bold; }
+.Subtitle { font-style: italic; }
+td > i { width: 64px; height: 64px; display: block; background-image: url(sprites.png); }
+]])
+css:close()
+
+print("OK")
