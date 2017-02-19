@@ -21,16 +21,16 @@ langcode = {
 }
 --]]
 
-local in_file = assert(arg[1], "\nno input\n\n")
+local exml_dir = assert(arg[1], "\n\n[ERROR] no input dir with NMS_LOC1.exml\n\n")
 xml = require("LuaXML")
 
-local x = xml.load(in_file)
+local x = xml.load(exml_dir .. "/NMS_LOC1.exml")
 assert("TkLocalisationTable" == x.template)
 local lang = {}
 
 local x1 = x[1]
 for i = 1, #x1 do
-    assert("TkLocalisationEntry" == x1[i].template)
+    assert("TkLocalisationEntry.xml" == x1[i].value)
     local x2 = x1[i]
     local id
     local t = {}
@@ -41,7 +41,9 @@ for i = 1, #x1 do
             id = x3.value
             lang[id] = {}
         else
-            table.insert(lang[id], x3[1].value)
+            local s = string.gsub(x3[1].value, "<IMG>", "#")
+            s = string.gsub(s, "<>", "#")
+            table.insert(lang[id], s)
         end
     end
 end

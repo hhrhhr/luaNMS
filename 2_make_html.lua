@@ -1,28 +1,26 @@
 assert("Lua 5.3" == _VERSION)
 
---[[
 langcode = {
-    ["English"] = 1,
-    ["French"] = 2,
-    ["Italian"] = 3,
-    ["German"] = 4,
-    ["Spanish"] = 5,
-    ["Russian"] = 6,
-    ["Polish"] = 7,
-    ["Dutch"] = 8,
-    ["Portuguese"] = 9,
-    ["LatinAmericanSpanish"] = 10,
-    ["BrazilianPortuguese"] = 11,
-    ["SimplifiedChinese"] = 12,
-    ["TraditionalChinese"] = 13,
-    ["Korean"] = 14,
-    ["Japanese"] = 15,
-    ["USEnglish"] = 16
+    [1] = "English",
+    [2] = "French",
+    [3] = "Italian",
+    [4] = "German",
+    [5] = "Spanish",
+    [6] = "Russian",
+    [7] = "Polish",
+    [8] = "Dutch",
+    [9] = "Portuguese",
+    [10] = "LatinAmericanSpanish",
+    [11] = "BrazilianPortuguese",
+    [12] = "SimplifiedChinese",
+    [13] = "TraditionalChinese",
+    [14] = "Korean",
+    [15] = "Japanese",
+    [16] = "USEnglish"
 }
---]]
 
-local in_dir = assert(arg[1], "\n\n[ERROR] no input\n\n")
-local L = tonumber(arg[2]) or 1 -- lang code
+local exml_dir = assert(arg[1], "\n\n[ERROR] no input dir with NMS_REALITY_*.exml\n\n")
+local L = tonumber(arg[2]) or -1 -- manual lang code
 
 xml = require("LuaXml")
 
@@ -42,12 +40,12 @@ end
 
 --[[ substance ]]--------------------------------------------------------------
 
-local x = xml.load(in_dir .. "\\NMS_REALITY_GCSUBSTANCETABLE.exml")
+local x = xml.load(exml_dir .. "\\NMS_REALITY_GCSUBSTANCETABLE.exml")
 assert("GcSubstanceTable" == x.template)
 
 x1 = x[1]
 for i = 1, #x1 do
-    assert("GcSubstanceData" == x1[i].template)
+    assert("GcRealitySubstanceData.xml" == x1[i].value)
     local x2 = x1[i]
 
     local t = {}
@@ -96,12 +94,12 @@ print("substances: " .. #substance)
 
 --[[ product ]]----------------------------------------------------------------
 
-x = xml.load(in_dir .. "\\NMS_REALITY_GCPRODUCTTABLE.exml")
+x = xml.load(exml_dir .. "\\NMS_REALITY_GCPRODUCTTABLE.exml")
 assert("GcProductTable" == x.template)
 
 x1 = x[1]
 for i = 1, #x1 do
-    assert("GcProductData" == x1[i].template)
+    assert("GcProductData.xml" == x1[i].value)
     local x2 = x1[i]
 
     local t = {}
@@ -155,12 +153,12 @@ print("products: " .. #product)
 
 --[[ technology ]]-------------------------------------------------------------
 
-x = xml.load(in_dir .. "\\NMS_REALITY_GCTECHNOLOGYTABLE.exml")
+x = xml.load(exml_dir .. "\\NMS_REALITY_GCTECHNOLOGYTABLE.exml")
 assert("GcTechnologyTable" == x.template)
 
 x1 = x[1]
 for i = 1, #x1 do
-    assert("GcTechnology" == x1[i].template)
+    assert("GcTechnology.xml" == x1[i].value)
     local x2 = x1[i]
 
     local t = {}
@@ -236,7 +234,7 @@ end
 print("technologies: " .. #technology)
 
 
---[[ ]]------------------------------------------------------------------------
+--[[ used icon list ]]----------------------------------------------------------
 
 x1 = nil
 xml = nil
@@ -262,7 +260,7 @@ w:close()
 
 print("icons: " .. #t)
 
---[[ ]]------------------------------------------------------------------------
+--[[ html utils ]]--------------------------------------------------------------
 
 local function td(body, bg)
     local bc = ""
@@ -305,240 +303,279 @@ end
 
 dofile("_lang.lua")
 
+--------------------------------------------------------------------------------
+
+local function html_output(L)
+
+--[[ substance_#.html]]-----------------------------------------------------------
     
---[[ substance.html]]---------------------------------------------------------
-
-io.write("write substance_" .. L .. ".html... ")
-local html = assert(io.open("substance_" .. L .. ".html", "w+"))
-
-html:write([[
+    io.write("write substance_" .. L .. ".html... ")
+    local html = assert(io.open("substance_" .. L .. ".html", "w+"))
+    
+    html:write([[
 <html>
 <head>
 <link rel="stylesheet" href="style.css">
-</style>
+</head>
 <body>
-<table>
-<tr>
+<table cols="5">
 ]])
-
-html:write("</tr>\n")
-
-for i = 1, #substance do
---    print(substance[i].Id)
-    local s = substance[i]
-    html:write("<tr>")
-
-    html:write(td(img(s.Icon), s.Colour))
-    html:write("<td>")
-    html:write(anchor(s.Id))
-    html:write(div("Name", lang[s.NameLower][L]))
-    html:write(div("Subtitle", lang[s.Subtitle][L]))
-    html:write("</td>")
-    html:write(td(lang[s.Symbol][L]))
-    html:write(td(s.BaseValue .. "U"))
-    html:write(td(lang[s.Description][L]))
-
-    html:write("</tr>\n")
-end
-
-html:write("</table>\n")
-html:write("</body>\n")
-html:close()
-
-print("OK")
-
-
---[[ product.html]]-----------------------------------------------------------
-
-io.write("write product_" .. L .. ".html... ")
-html = assert(io.open("product_" .. L .. ".html", "w+"))
-
-html:write([[
-<html>
-<head>
-<link rel="stylesheet" href="style.css">
-<body>
-<table>
-<tr>
-]])
-
-html:write("</tr>\n")
-
-for i = 1, #product do
---    print(substance[i].Id)
-    local p = product[i]
-    html:write("<tr>")
-
-    html:write(td(img(p.Icon), p.Colour))
-    html:write("<td>")
-    html:write(anchor(p.Id))
-    html:write(div("Name", lang[p.NameLower][L]))
-    html:write(div("Subtitle", lang[p.Subtitle][L]))
-    html:write("</td>")
-    html:write(td(p.BaseValue .. "U"))
-    html:write("<td>")
-    if #p.Requirements > 0 then
-        html:write("<table class='Requirements'>")
-        local sum = 0
-        for j = 1, #p.Requirements do
-            local id      = p.Requirements[j][1]
-            local invtype = p.Requirements[j][2]
-            local amount  = p.Requirements[j][3]
-
-            local t = find_by_id(invtype, id)
-            local name = lang[t.NameLower][L]
-            name = "<a href='" .. invtype:lower() .. "_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
-            local price = (t.BaseValue * amount) >> 0
-            sum = (sum + price)
-            html:write("<tr><td>" .. name .. "</td>")
-            html:write("<td>x" .. amount .. "</td>")
-            html:write("<td>" .. price .. "U</td></tr>")
-        end
-        html:write("<tr><td class='total'></td><td class='total'>∑:</td><td class='total'>" .. sum .. "U</td></tr></table>")
+    
+    for i = 1, #substance do
+    --    print(substance[i].Id)
+        local s = substance[i]
+        html:write("<tr>")
+    
+        html:write(td(img(s.Icon), s.Colour))
+        html:write("<td>")
+        html:write(anchor(s.Id))
+        html:write(div("Name", lang[s.NameLower][L]))
+        html:write(div("Subtitle", lang[s.Subtitle][L]))
+        html:write("</td>")
+        html:write(td(lang[s.Symbol][L]))
+        html:write(td(s.BaseValue .. "U"))
+        html:write(td(lang[s.Description][L]))
+    
+        html:write("</tr>\n")
     end
-    html:write("</td>")
-    html:write(td(lang[p.Description][L]))
-
-    html:write("</tr>\n")
-end
-
-html:write("</table>\n")
-html:write("</body>\n")
-html:close()
-
-print("OK")
-
-
---[[ technology.html]]-----------------------------------------------------------
-
-io.write("write technology_" .. L .. ".html... ")
-html = assert(io.open("technology_" .. L .. ".html", "w+"))
-
-html:write([[
+    
+    html:write("</table>\n")
+    html:write("</body>\n")
+    html:close()
+    
+    print("OK")
+    
+    
+--[[ product_#.html]]-------------------------------------------------------------
+    
+    io.write("write product_" .. L .. ".html... ")
+    html = assert(io.open("product_" .. L .. ".html", "w+"))
+    
+    html:write([[
 <html>
 <head>
 <link rel="stylesheet" href="style.css">
+</head>
 <body>
-<table>
-<tr>
+<table cols="5">
 ]])
-
-html:write("</tr>\n")
-
-for i = 1, #technology do
---    print(substance[i].Id)
-    local t = technology[i]
-    html:write("<tr>")
-
-    html:write(td(img(t.Icon), t.Colour))
-    html:write("<td>")
-    html:write(anchor(t.Id))
-    html:write(div("Name", lang[t.NameLower][L]))
-    html:write(div("Subtitle", lang[t.Subtitle][L]))
-    html:write("</td>")
-    html:write(td(t.Value .. "U"))
-
-    html:write("<td>")
-    if #t.Requirements > 0 then
-        html:write("<table class='Requirements'>")
-        local sum = 0
-        for j = 1, #t.Requirements do
-            local id      = t.Requirements[j][1]
-            local invtype = t.Requirements[j][2]
-            local amount  = t.Requirements[j][3]
-
-            local tid = find_by_id(invtype, id)
-            local name = lang[tid.NameLower][L]
-            name = "<a href='" .. invtype:lower() .. "_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
-            local price = (tid.BaseValue * amount) >> 0
-            sum = (sum + price)
-            html:write("<tr><td>" .. name .. "</td>")
-            html:write("<td>x" .. amount .. "</td>")
-            html:write("<td>" .. price .. "U</td></tr>")
-        end
-        html:write("<tr><td class='total'></td><td class='total'>∑:</td><td class='total'>" .. sum .. "U</td></tr></table>")
-    end
-
-    html:write("</td><td>")
-
-    if #t.ChargeBy > 0 then
-        html:write("<table class='ChargeBy'>")
-        for j = 1, #t.ChargeBy do
-            html:write("<tr>")
-            local id = t.ChargeBy[j]
-
-            local tid = find_by_id("Substance", id)
-            local name
-            if tid then
-                name = lang[tid.NameLower][L]
-                name = "<a href='substance_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
-            else
-                tid = find_by_id("Product", id)
-                name = lang[tid.NameLower][L]
-                name = "<a href='product_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
+    
+    for i = 1, #product do
+        --print(product[i].Id)
+        local p = product[i]
+        html:write("<tr>")
+    
+        html:write(td(img(p.Icon), p.Colour))
+        html:write("<td>")
+        html:write(anchor(p.Id))
+        html:write(div("Name", lang[p.NameLower] and lang[p.NameLower][L] or p.NameLower))
+        html:write(div("Subtitle", lang[p.Subtitle] and lang[p.Subtitle][L] or p.Subtitle))
+        html:write("</td>")
+        html:write(td(p.BaseValue .. "U"))
+        html:write("<td>")
+        if #p.Requirements > 0 then
+            html:write("<table class='Requirements' cols='3'>")
+            local sum = 0
+            for j = 1, #p.Requirements do
+                local id      = p.Requirements[j][1]
+                local invtype = p.Requirements[j][2]
+                local amount  = p.Requirements[j][3]
+    
+                local t = find_by_id(invtype, id)
+                local name = lang[t.NameLower][L]
+                name = "<a href='" .. invtype:lower() .. "_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
+                local price = (t.BaseValue * amount) >> 0
+                sum = (sum + price)
+                html:write("<tr><td>" .. name .. "</td>")
+                html:write("<td>x" .. amount .. "</td>")
+                html:write("<td>" .. price .. "U</td></tr>")
             end
-            html:write("<td>" .. name .. "</td>")
-
-            local charge = string.format("%.1f", t.ChargeAmount / tid.ChargeValue)
-            html:write("<td>" .. charge .. "</td>")
-            html:write("</tr>")
+            html:write("<tr><td class='total'></td><td class='total'>∑:</td><td class='total'>" .. sum .. "U</td></tr></table>")
         end
-        html:write("</table>")
+        html:write("</td>")
+        html:write(td(lang[p.Description] and lang[p.Description][L] or p.Description))
+    
+        html:write("</tr>\n")
     end
-
-    html:write("</td><td>")
-
-    if #t.StatBonuses > 0 then
-        html:write("<table class='StatBonuses'>")
-        for j = 1, #t.StatBonuses do
-            html:write("<tr>")
-            html:write("<td>" .. t.StatBonuses[j][1] .. "</td>")
-            html:write("<td>=> " .. t.StatBonuses[j][2] .. "</td>")
-            html:write("<td>(+" .. t.StatBonuses[j][3] .. ")</td>")
-            html:write("</tr>")
+    
+    html:write("</table>\n")
+    html:write("</body>\n")
+    html:close()
+    
+    print("OK")
+    
+    
+--[[ technology_#.html]]----------------------------------------------------------
+    
+    io.write("write technology_" .. L .. ".html... ")
+    html = assert(io.open("technology_" .. L .. ".html", "w+"))
+    
+    html:write([[
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<table cols="7">
+]])
+    
+    for i = 1, #technology do
+    --    print(substance[i].Id)
+        local t = technology[i]
+        html:write("<tr>")
+    
+        html:write(td(img(t.Icon), t.Colour))
+        html:write("<td>")
+        html:write(anchor(t.Id))
+        html:write(div("Name", lang[t.NameLower][L]))
+        html:write(div("Subtitle", lang[t.Subtitle][L]))
+        html:write("</td>")
+        html:write(td(t.Value .. "U"))
+    
+        html:write("<td>")
+        if #t.Requirements > 0 then
+            html:write("<table class='Requirements'>")
+            local sum = 0
+            for j = 1, #t.Requirements do
+                local id      = t.Requirements[j][1]
+                local invtype = t.Requirements[j][2]
+                local amount  = t.Requirements[j][3]
+    
+                local tid = find_by_id(invtype, id)
+                local name = lang[tid.NameLower][L]
+                name = "<a href='" .. invtype:lower() .. "_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
+                local price = (tid.BaseValue * amount) >> 0
+                sum = (sum + price)
+                html:write("<tr><td>" .. name .. "</td>")
+                html:write("<td>x" .. amount .. "</td>")
+                html:write("<td>" .. price .. "U</td></tr>")
+            end
+            html:write("<tr><td class='total'></td><td class='total'>∑:</td><td class='total'>" .. sum .. "U</td></tr></table>")
         end
-        html:write("</table>")
+    
+        html:write("</td><td>")
+    
+        if #t.ChargeBy > 0 then
+            html:write("<table class='ChargeBy'>")
+            for j = 1, #t.ChargeBy do
+                html:write("<tr>")
+                local id = t.ChargeBy[j]
+    
+                local tid = find_by_id("Substance", id)
+                local name
+                if tid then
+                    name = lang[tid.NameLower][L]
+                    name = "<a href='substance_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
+                else
+                    tid = find_by_id("Product", id)
+                    name = lang[tid.NameLower][L]
+                    name = "<a href='product_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
+                end
+                html:write("<td>" .. name .. "</td>")
+    
+                local charge = string.format("%.1f", t.ChargeAmount / tid.ChargeValue)
+                html:write("<td>" .. charge .. "</td>")
+                html:write("</tr>")
+            end
+            html:write("</table>")
+        end
+    
+        html:write("</td><td>")
+    
+        if #t.StatBonuses > 0 then
+            html:write("<table class='StatBonuses'>")
+            for j = 1, #t.StatBonuses do
+                html:write("<tr>")
+                html:write("<td>" .. t.StatBonuses[j][1] .. "</td>")
+                html:write("<td>=> " .. t.StatBonuses[j][2] .. "</td>")
+                html:write("<td>(+" .. t.StatBonuses[j][3] .. ")</td>")
+                html:write("</tr>")
+            end
+            html:write("</table>")
+        end
+    
+        html:write("</td>")
+    
+        html:write(td(lang[t.Description][L]))
+    
+        html:write("</tr>\n")
     end
+    
+    html:write("</table>\n")
+    html:write("</body>\n")
+    html:close()
+    
+    print("OK")
+    
+    
+    --[[ index_#.html ]]-------------------------------------------------------------
+    
+    local loc_names = {
+        lang["SUBSTANCE"][L],
+        lang["PRODUCT"][L],
+        lang["TECH"][L]
+    }
+    
+    io.write("write index_" .. L .. ".html... ")
+    html = assert(io.open("index_" .. L .. ".html", "w+"))
+    
+    html:write([[
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<ul>
+]])
+    
+    html:write("<li><a href='substance_" .. L .. ".html'>" .. loc_names[1] .. "</a></li>")
+    html:write("<li><a href='product_" .. L .. ".html'>" .. loc_names[2] .. "</a></li>")
+    html:write("<li><a href='technology_" .. L .. ".html'>" .. loc_names[3] .. "</a></li>")
+    html:write("</ul>\n")
+    html:write("</body>\n")
 
-    html:write("</td>")
+    html:close()
+    
+    print("OK")
 
-    html:write(td(lang[t.Description][L]))
-
-    html:write("</tr>\n")
 end
-
-html:write("</table>\n")
-html:write("</body>\n")
-html:close()
-
-print("OK")
 
 
 --[[ index.html ]]-------------------------------------------------------------
 
-local loc_names = {
-    lang["SUBSTANCE"][L],
-    lang["PRODUCT"][L],
-    lang["TECH"][L]
-}
-
-io.write("write index_" .. L .. ".html... ")
-html = assert(io.open("index_" .. L .. ".html", "w+"))
-
-html:write([[
+local function index_output()
+    io.write("write index.html... ")
+    html = assert(io.open("index.html", "w+"))
+    
+    html:write([[
 <html>
 <head>
 <link rel="stylesheet" href="style.css">
+</head>
 <body>
+<ul>
 ]])
+    
+    for i = 1, #langcode do
+        local l = langcode[i]
+        html:write("<li><a href='index_" .. i .. ".html'>" .. l .. "</a></li>\n")
+    end
+    html:write([[
+</ul>
+</body>
+]])
+    html:close()
+    
+    print("OK")
+end
 
-html:write("<ul>")
-html:write("<li><a href='substance_" .. L .. ".html'>" .. loc_names[1] .. "</a></li>")
-html:write("<li><a href='product_" .. L .. ".html'>" .. loc_names[2] .. "</a></li>")
-html:write("<li><a href='technology_" .. L .. ".html'>" .. loc_names[3] .. "</a></li>")
-html:write("</ul>")
+--------------------------------------------------------------------------------
 
-html:write("</body>\n")
-html:close()
-
-print("OK")
+if L > 0 then
+    html_output(L)
+else
+    for i = 1, 16 do
+        html_output(i)
+    end
+    index_output()
+end
