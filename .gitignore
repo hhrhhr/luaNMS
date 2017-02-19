@@ -2,3 +2,4 @@
 *.dll
 magic.xml
 LuaXml.lua
+tmp/*.*
