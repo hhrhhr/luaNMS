@@ -52,7 +52,7 @@ set files=
 for /f %%i in (_icons_list.txt) do (
     set files=!files! %%~ni.png
 )
-%IMM% -size 64x64 xc:transparent %files% -tile 16x16 -geometry 64x64+0+0 -background transparent _sprites.png
+%IMM% -size 64x64 xc:transparent %files% -tile 16x24 -geometry 64x64+0+0 -background transparent _sprites.png
 popd
 
 :step3_4

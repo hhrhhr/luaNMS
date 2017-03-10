@@ -53,6 +53,7 @@ for i = 1, #x1 do
     t.NameLower     = x2[2].value
     t.Id            = x2[3].value
     t.Symbol        = x2[4].value
+    if t.Symbol == "" then t.Symbol = "INTERACT_EMPTY" end
     t.Icon          = get_icon_name(x2[5][1].value)
     --              = x2[6][1].value
     t.Subtitle      = x2[7][1].value
@@ -208,22 +209,23 @@ for i = 1, #x1 do
         end
     end
     t.StatBonuses = {}
-    if #x2[23] > 0 then
-        for j = 1, #x2[23] do
-            local StatsType = x2[23][j][1][1].value
-            local Bonus     = x2[23][j][2].value
-            local Level     = x2[23][j][3].value
+    -- 23 BaseStat
+    if #x2[24] > 0 then
+        for j = 1, #x2[24] do
+            local StatsType = x2[24][j][1][1].value
+            local Bonus     = x2[24][j][2].value
+            local Level     = x2[24][j][3].value
             table.insert(t.StatBonuses, {StatsType, Bonus, Level})
             -- print(StatsType, Bonus, Level)
         end
     end
-    t.RequiredTech  = x2[24].value
-    t.RequiredLevel = x2[25].value
+    t.RequiredTech  = x2[25].value
+    t.RequiredLevel = x2[26].value
     t.UpgradeColour = {}
-    -- 26
-    t.LinkColour    = {}
     -- 27
-    t.RewardGroup   = x2[28].value
+    t.LinkColour    = {}
+    -- 28
+    t.RewardGroup   = x2[29].value
 
     local s = string.gsub(x2[9][1].value, "/", "\\")
     table.insert(icon, s)  -- for Win
