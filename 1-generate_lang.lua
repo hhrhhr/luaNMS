@@ -26,7 +26,7 @@ local out_dir = arg[2] or "."
 
 xml = require("LuaXML")
 
-local x = xml.load(exml_dir .. "/NMS_LOC1.exml")
+local x = xml.load(exml_dir .. "/LANGUAGE/NMS_LOC1.exml")
 assert("TkLocalisationTable" == x.template)
 local lang = {}
 

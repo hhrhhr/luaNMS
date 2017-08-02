@@ -40,7 +40,7 @@ end
 
 --[[ substance ]]--------------------------------------------------------------
 
-local x = xml.load(exml_dir .. "\\NMS_REALITY_GCSUBSTANCETABLE.exml")
+local x = xml.load(exml_dir .. "/METADATA/REALITY/TABLES/NMS_REALITY_GCSUBSTANCETABLE.exml")
 assert("GcSubstanceTable" == x.template)
 
 x1 = x[1]
@@ -95,7 +95,7 @@ print("substances: " .. #substance)
 
 --[[ product ]]----------------------------------------------------------------
 
-x = xml.load(exml_dir .. "\\NMS_REALITY_GCPRODUCTTABLE.exml")
+x = xml.load(exml_dir .. "/METADATA/REALITY/TABLES/NMS_REALITY_GCPRODUCTTABLE.exml")
 assert("GcProductTable" == x.template)
 
 x1 = x[1]
@@ -154,7 +154,7 @@ print("products: " .. #product)
 
 --[[ technology ]]-------------------------------------------------------------
 
-x = xml.load(exml_dir .. "\\NMS_REALITY_GCTECHNOLOGYTABLE.exml")
+x = xml.load(exml_dir .. "/METADATA/REALITY/TABLES/NMS_REALITY_GCTECHNOLOGYTABLE.exml")
 assert("GcTechnologyTable" == x.template)
 
 x1 = x[1]

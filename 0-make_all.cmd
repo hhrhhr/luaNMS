@@ -3,8 +3,7 @@ setlocal enabledelayedexpansion
 
 if %1.==. (set LANG=) else (set LANG=%1)
 
-set EXML=d:\tmp\nms
-set DDS=d:\tmp\nms_unpacked
+set NMSU=d:\tmp\nms_unpacked
 set WORK=.\tmp
 set IM=magick convert
 set IMM=magick montage
@@ -15,14 +14,14 @@ if not exist %WORK% mkdir %WORK%
 if not exist docs mkdir docs
 
 :step1
-lua 1-generate_lang.lua %EXML% %WORK%
+lua 1-generate_lang.lua %NMSU% %WORK%
 
 :step2
-lua 2_make_html.lua %EXML% %WORK% %LANG%
+lua 2_make_html.lua %NMSU% %WORK% %LANG%
 
 :step3_1
 for /f %%i in (%WORK%\_icons_list.txt) do (
-    set fp=%DDS%\%%i
+    set fp=%NMSU%\%%i
     set fn=%%~ni.png
     echo !fp!
     %IM% "!fp!" -resize 64x64 "%WORK%\!fn!"
