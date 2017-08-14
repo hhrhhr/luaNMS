@@ -35,7 +35,7 @@ local x1
 
 local function get_icon_name(path)
     local s = string.match(path, "^.+/(.+)$")
-    return string.sub(s, 1, -5)
+    return s and string.sub(s, 1, -5) or ""
 end
 
 --[[ substance ]]--------------------------------------------------------------
@@ -51,13 +51,19 @@ for i = 1, #x1 do
     local t = {}
     t.Name          = x2[1].value
     t.NameLower     = x2[2].value
+if t.NameLower == "" then t.NameLower = "INTERACT_EMPTY" end
+if t.NameLower == "E" then t.NameLower = "INTERACT_EMPTY" end
     t.Id            = x2[3].value
     t.Symbol        = x2[4].value
-    if t.Symbol == "" then t.Symbol = "INTERACT_EMPTY" end
+if t.Symbol == "" then t.Symbol = "INTERACT_EMPTY" end
+if t.Symbol == "1" then t.Symbol = "INTERACT_EMPTY" end
+if t.Symbol == "VE" then t.Symbol = "INTERACT_EMPTY" end
     t.Icon          = get_icon_name(x2[5][1].value)
     --              = x2[6][1].value
     t.Subtitle      = x2[7][1].value
+if t.Subtitle == "" then t.Subtitle = "INTERACT_EMPTY" end
     t.Description   = x2[8][1].value
+if t.Description == "" then t.Description = "INTERACT_EMPTY" end
     t.Colour = {}
     for i = 1, 4 do
         local c = x2[9][i].value
@@ -390,8 +396,8 @@ local function html_output(L)
                 local id      = p.Requirements[j][1]
                 local invtype = p.Requirements[j][2]
                 local amount  = p.Requirements[j][3]
-    
                 local t = find_by_id(invtype, id)
+if not t then t = {NameLower="INTERACT_EMPTY",BaseValue=0} end 
                 local name = lang[t.NameLower][L]
                 name = "<a href='" .. invtype:lower() .. "_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
                 local price = (t.BaseValue * amount) >> 0
@@ -439,6 +445,7 @@ local function html_output(L)
 
         html:write("<td>")
         html:write(anchor(t.Id))
+if t.NameLower and not lang[t.NameLower] then t.NameLower="INTERACT_EMPTY" end
         html:write(div("Name", lang[t.NameLower][L]))
         html:write(div("Subtitle", lang[t.Subtitle][L]))
 
@@ -457,6 +464,7 @@ local function html_output(L)
                     name = "<a href='substance_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
                 else
                     tid = find_by_id("Product", id)
+if not tid then tid = {NameLower="INTERACT_EMPTY",ChargeValue=1} end
                     name = lang[tid.NameLower][L]
                     name = "<a href='product_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
                 end
@@ -482,6 +490,7 @@ local function html_output(L)
                 local amount  = t.Requirements[j][3]
     
                 local tid = find_by_id(invtype, id)
+if not tid then tid = {NameLower="INTERACT_EMPTY",BaseValue=1} end
                 local name = lang[tid.NameLower][L]
                 name = "<a href='" .. invtype:lower() .. "_" .. L .. ".html#" .. id .. "'>" .. name .. "</a>"
                 local price = (tid.BaseValue * amount) >> 0
