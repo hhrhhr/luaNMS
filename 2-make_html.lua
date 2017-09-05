@@ -548,7 +548,7 @@ local function index_output()
 <html>
 <head><link rel="stylesheet" href="style.css"></head>
 <body>
-<h1>ver 1.34</h1>
+<h1>ver 1.35</h1>
 <table cols='4'>
 ]])
 

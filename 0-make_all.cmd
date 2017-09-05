@@ -5,6 +5,7 @@ set NMSU=d:\tmp\nms_unpacked
 set WORK=.\tmp
 set DOCS=.\docs
 
+set MBIN=.\bin\MBINCompiler.exe
 set IM=magick convert
 set IMM=magick montage
 set LUA=.\bin\lua
@@ -16,6 +17,15 @@ setlocal enabledelayedexpansion
 if %1.==. (set LANG=) else (set LANG=%1)
 if not exist %WORK% mkdir %WORK%
 if not exist %DOCS% mkdir %DOCS%
+
+
+:step0
+for /r %NMSU%\LANGUAGE %%i in (*.MBIN) do (
+    %MBIN% "%%i"
+)
+for /r %NMSU%\METADATA\REALITY\TABLES %%i in (*.MBIN) do (
+    %MBIN% "%%i"
+)
 
 
 :step1
